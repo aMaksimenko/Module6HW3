@@ -29,8 +29,8 @@ public abstract class BaseDataService<T>
             catch (Exception ex)
             {
                 transaction.Rollback();
-                _logger.LogError(ex, $"transaction is rollbacked");
-                return default(T1) !;
+                _logger.LogError(ex, $"transaction is roll-backed");
+                return default!;
             }
         }
     }

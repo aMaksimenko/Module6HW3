@@ -24,21 +24,73 @@ public class CatalogService : BaseDataService<ApplicationDbContext>, ICatalogSer
 
     public async Task<PaginatedItemsResponse<CatalogItemDto>?> GetCatalogItemsAsync(int pageSize, int pageIndex)
     {
-        return await ExecuteSafe(async () =>
-        {
-            var result = await _catalogItemRepository.GetByPageAsync(pageIndex, pageSize);
-            if (result == null)
+        return await ExecuteSafe(
+            async () =>
             {
-                return null;
-            }
+                var result = await _catalogItemRepository.GetByPageAsync(pageIndex, pageSize);
 
-            return new PaginatedItemsResponse<CatalogItemDto>()
+                return new PaginatedItemsResponse<CatalogItemDto>()
+                {
+                    Count = result.TotalCount,
+                    Data = result.Data.Select(s => _mapper.Map<CatalogItemDto>(s)).ToList(),
+                    PageIndex = pageIndex,
+                    PageSize = pageSize
+                };
+            });
+    }
+
+    public async Task<CatalogItemDto> GetByIdAsync(int id)
+    {
+        return await ExecuteSafe(
+            async () =>
             {
-                Count = result.TotalCount,
-                Data = result.Data.Select(s => _mapper.Map<CatalogItemDto>(s)).ToList(),
-                PageIndex = pageIndex,
-                PageSize = pageSize
-            };
-        });
+                var result = await _catalogItemRepository.GetByIdAsync(id);
+
+                return _mapper.Map<CatalogItemDto>(result);
+            });
+    }
+
+    public async Task<IEnumerable<CatalogItemDto>> GetByBrandAsync(string brandTitle)
+    {
+        return await ExecuteSafe(
+            async () =>
+            {
+                var result = await _catalogItemRepository.GetByBrandAsync(brandTitle);
+
+                return result.Select(s => _mapper.Map<CatalogItemDto>(s)).ToList();
+            });
+    }
+
+    public async Task<IEnumerable<CatalogItemDto>> GetByTypeAsync(string typeTitle)
+    {
+        return await ExecuteSafe(
+            async () =>
+            {
+                var result = await _catalogItemRepository.GetByTypeAsync(typeTitle);
+
+                return result.Select(s => _mapper.Map<CatalogItemDto>(s)).ToList();
+            });
+    }
+
+    public async Task<IEnumerable<CatalogBrandDto>> GetBrandsAsync()
+    {
+        return await ExecuteSafe(
+            async () =>
+            {
+                var result = await _catalogItemRepository.GetBrandsAsync();
+
+                return result.Select(s => _mapper.Map<CatalogBrandDto>(s)).ToList();
+            });
+    }
+
+    public async Task<IEnumerable<CatalogTypeDto>> GetTypesAsync()
+    {
+        return await ExecuteSafe(
+            async () =>
+            {
+                var result = await _catalogItemRepository.GetTypesAsync();
+
+                return result.Select(s => _mapper.Map<CatalogTypeDto>(s)).ToList();
+            });
     }
 }
